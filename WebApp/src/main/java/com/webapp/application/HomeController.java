@@ -45,7 +45,16 @@ public class HomeController {
 		mv.setViewName("home"); //view name jsp path/page name
 		return mv;
 	}
-
+	// http://localhost:8080/object
+	//http://localhost:8080/object?id=88&course=ABC
+	// http://localhost:8080/object?id=88&course=ABC&name=xyz
+	@RequestMapping("object")	
+	public ModelAndView modelobject(Student stud){
+		ModelAndView mv = new ModelAndView();
+		mv.addObject("obj",stud);//send getter setter object
+		mv.setViewName("Student"); 
+		return mv;
+	}
 
 	
 }
