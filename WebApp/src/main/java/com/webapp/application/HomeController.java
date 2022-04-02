@@ -41,6 +41,7 @@ public class HomeController {
 	public ModelAndView modelview(@RequestParam("name") String Myname,HttpSession session){
 		ModelAndView mv = new ModelAndView();
 		mv.addObject("name",Myname); // send data/object in mv
+		mv.addObject(session);
 		mv.setViewName("home"); //view name jsp path/page name
 		return mv;
 	}
