@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class HomeController {
 
+	//http://localhost:8080/home
 	@RequestMapping("home")	
 	public String home(HttpServletRequest req){
 		String name = req.getParameter("name");
@@ -25,5 +26,15 @@ public class HomeController {
 		System.out.println("todo IS HERE");
 		return "home";
 	}
+	
+	// http://localhost:8080/student <- Not found page (param null/undefined not allowed)
+	// http://localhost:8080/student?name <?> <-Required req param	
+	@RequestMapping("student")	
+	public String student(@RequestParam("name") String Myname,HttpSession session){
+		session.setAttribute("name", Myname);
+		System.out.println("student IS HERE");
+		return "home";
+	}
 
+	
 }
