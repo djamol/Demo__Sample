@@ -19,5 +19,11 @@ public class HomeController {
 		System.out.println("HOME IS HERE");
 		return "home";
 	}
+	@RequestMapping("todo")	
+	public String todo(String name,HttpSession session){
+		session.setAttribute("name", name);
+		System.out.println("todo IS HERE");
+		return "home";
+	}
 
 }
