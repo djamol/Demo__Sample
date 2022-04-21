@@ -1,0 +1,226 @@
+<style>
+  body
+  {
+   margin:0;
+   padding:0;
+   background-color:#f1f1f1;
+  }
+  .box
+  {
+   width:1270px;
+   padding:20px;
+   background-color:#fff;
+   border:1px solid #ccc;
+   border-radius:5px;
+   margin-top:25px;
+   box-sizing:border-box;
+  }
+  </style>
+  <div class="container box">   <button id="button" name="button" ng-click="logout()" value="Log out" class="btn btn-danger" style="line-height: 12px;     
+     font-size: 8pt;
+     font-family: tahoma;
+     margin-top: 1px;
+     margin-right: 47px;
+     position:absolute;
+     top:0;
+     right:0;">Log out</button>
+   <br />
+   <div class="table-responsive">
+   <br />
+    <div align="right">
+     <button type="button" name="add" id="add" class="btn btn-info">Add</button>
+	<input type="file" id="upload" style="display:none;"accept=".csv"  />
+<!-- 	<button id="button" name="button" value="Upload" class="btn btn-info" onclick="thisFileUpload();">Upload</button> -->
+	<script>
+        function thisFileUpload() {
+            document.getElementById("upload").click();
+        };
+		
+		 $(document).ready(function(){
+        $("#upload").change(function(){
+          var result = confirm("Are you sure you want to Import CSV/Excel File?");
+				if (result) {
+				console.log("started");
+				var formData = new FormData();
+				formData.append('file', $('#upload')[0].files[0]);				
+									 $.ajax({
+						 url:"/laravelAPI/public/api/import",
+						 method:"POST",
+						 processData: false,  // tell jQuery not to process the data
+       contentType: false,  // tell jQuery not to set contentType
+						 data:formData,
+						 success:function(data){
+							 var obj = jQuery.parseJSON( data );
+							 console.log(obj.data);
+							 for(var i =0;i < obj.data.length;i++)
+							 if(obj.data[i].indexOf("Added") != -1){
+						  $('#alert_message').html('<div class="alert alert-success">'+obj.data[i]+'</div>');
+							 }else{
+						  $('#alert_message').html('<div class="alert alert-danger">'+obj.data[i]+'</div>');
+							 
+							 }
+						 }
+						});
+						
+				}
+        });
+    });
+</script>
+    </div>
+    <br />
+    <div id="alert_message"></div>
+    <table id="user_data" class="table table-bordered table-striped">
+     <thead>
+      <tr>
+       <th>SAP ID</th>
+       <th>Host Name</th>
+       <th>Loop Back</th>
+       <th>Mac Address</th>
+       <th></th>
+      </tr>
+     </thead>
+    </table>
+   </div>
+  </div>
+ </body>
+
+
+<!-- Modal -->
+<div id="editor" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">EDIT SAPID : {{$scope.edit.sapid}}</h4>
+      </div>
+      <div class="modal-body">
+      SAP ID:  <input id="edit_sapid" class="form-control form-control-sm" type="number" readonly="">  
+      Hostname:  <input id="edit_hostname" class="form-control form-control-sm" type="text" placeholder="HOSTNAME">
+      Loopback:  <input  id="edit_loopback" class="form-control form-control-sm" type="text" placeholder="Loopback">
+      Mac Address:
+<input  id="edit_mac_address" class="form-control form-control-sm" type="text" placeholder="Mac Address">
+<button class="btn btn-primary" ng-click="editor_data()">Submit</button>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+</html>
+
+
+
+<script type="text/javascript" language="javascript" >
+ $(document).ready(function(){
+  
+  //fetch_data();
+  function insert(){
+    //angular.element(document.getElementById('listApp')).scope().insert();
+  }
+  function fetch_data()
+  {
+   var dataTable = $('#user_data').DataTable({
+    "processing" : true,
+    "serverSide" : true,
+    "order" : [],
+    "ajax" : {
+     url:"laravelAPI/public/api/posts",
+     type:"POST"
+    }
+   });
+  }
+ 
+  function update_data(id, column_name, value)
+  {
+   $.ajax({
+    url:"update.php",
+    method:"POST",
+    data:{id:id, column_name:column_name, value:value},
+    success:function(data)
+    {
+     $('#alert_message').html('<div class="alert alert-success">'+data+'</div>');
+     $('#user_data').DataTable().destroy();
+     getDataHolder();
+    }
+   });
+   setInterval(function(){
+    $('#alert_message').html('');
+   }, 5000);
+  }
+  $(document).on('blur', '.update', function(){
+   var id = $(this).data("id");
+   var column_name = $(this).data("column");
+   var value = $(this).text();
+   update_data(id, column_name, value);
+  });
+  
+  $('#add').click(function(){
+   var html = '<tr>';
+   html += '<td  id="data1"></td>';
+   html += '<td contenteditable id="data2"></td>';
+   html += '<td contenteditable id="data3"></td>';
+   html += '<td contenteditable id="data4"></td>';
+   html += '<td><button type="button" id="insert" onclick="insert()" class="btn btn-success btn-xs">Insert</button></td>';
+   html += '</tr>';
+   $('#user_data tbody').prepend(html);
+  });
+  
+  $(document).on('click', '#insert', function(){
+   var hostname = $('#data2').text();
+   var mac_address = $('#data4').text();
+   var loopback = $('#data3').text();
+   var token = getCookie("token");
+   if(hostname != '' && mac_address != '' )
+   {
+    $.ajax({
+     url:"/laravelAPI/public/api/router",
+     method:"POST",
+      headers: {
+      "Authorization": "Bearer " + token
+      },
+     data:{hostname:hostname, mac_address:mac_address,loopback:loopback},
+     success:function(data)
+     {
+      $('#alert_message').html('<div class="alert alert-success">'+data.message+'</div>');
+      $('#user_data').DataTable().destroy();
+      getDataHolder();
+     }
+    });
+    setInterval(function(){
+     $('#alert_message').html('');
+    }, 5000);
+   }
+   else
+   {
+    alert("Host and Mac Address Fields is required");
+   }
+  });
+  
+  $(document).on('click', '.delete', function(){
+   var id = $(this).attr("id");
+   if(confirm("Are you sure you want to remove this?"))
+   {
+    $.ajax({
+     url:"delete.php",
+     method:"POST",
+     data:{id:id},
+     success:function(data){
+      $('#alert_message').html('<div class="alert alert-success">'+data+'</div>');
+      $('#user_data').DataTable().destroy();
+      getDataHolder();
+     }
+    });
+    setInterval(function(){
+     $('#alert_message').html('');
+    }, 5000);
+   }
+  });
+ });
+</script>
+
+
