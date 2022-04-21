@@ -5,7 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Router Management</title>
+        <title>Management</title>
 
         <link href="/laravelAPI/public/assets/bootstrap.min.css" rel="stylesheet">
     <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
@@ -18,6 +18,7 @@
         <script src="/laravelAPI/public/app/controller/mainController.js"></script>
         <script src="/laravelAPI/public/app/controller/LoginController.js"></script>
         <script src="/laravelAPI/public/app/controller/SignupController.js"></script>
+        <script ng-if="current_page=='student'"src="/laravelAPI/public/app/controller/studentController.js"></script>
 
             
  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
@@ -33,7 +34,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-12">
-                    <h1>Router Management Tool</h1>
+                    <h1 id="main_title">Router Management Tool</h1>
                 </div>
             </div>
 </div>

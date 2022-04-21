@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\RegisterController;
 use App\Http\Controllers\API\PostController;
 use App\Http\Controllers\API\ImportController;
+use App\Http\Controllers\API\StudentController;
 
 use App\Http\Controllers\API\IPController;
 
@@ -19,6 +20,9 @@ Route::middleware('auth:api')->group( function () {
     Route::resource('router', IPController::class);
 });
 
+Route::middleware('auth:api')->group( function () {
+    Route::resource('student', StudentController::class);
+});
 
 Route::post('import', [ImportController::class, 'import']);
 Route::post('all', [IPController::class, 'getdata']);

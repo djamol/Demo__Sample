@@ -19,6 +19,10 @@ mainApp.config(['$routeProvider', function($routeProvider) {
         templateUrl: 'template/index.html',
         controller: 'MainController'
     }).
+    when('/student', {
+        templateUrl: 'template/student.html',
+        controller: 'StudentController'
+    }).
 
     when('/', {
         templateUrl: 'template/login.html',
