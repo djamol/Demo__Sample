@@ -1,0 +1,267 @@
+<style>
+  body
+  {
+   margin:0;
+   padding:0;
+   background-color:#f1f1f1;
+  }
+  .box
+  {
+   width:1270px;
+   padding:20px;
+   background-color:#fff;
+   border:1px solid #ccc;
+   border-radius:5px;
+   margin-top:25px;
+   box-sizing:border-box;
+  }
+  </style>
+  <div class="container box">   <button id="button" name="button" ng-click="logout()" value="Log out" class="btn btn-danger" style="line-height: 12px;     
+     font-size: 8pt;
+     font-family: tahoma;
+     margin-top: 1px;
+     margin-right: 47px;
+     position:absolute;
+     top:0;
+     right:0;">Log out</button>
+   <br />
+   <div class="table-responsive">
+   <br />
+    <div align="right">
+     <button type="button" name="add" id="add" class="btn btn-info">Add</button>
+	<input type="file" id="upload" style="display:none;"accept=".csv"  />
+<!-- 	<button id="button" name="button" value="Upload" class="btn btn-info" onclick="thisFileUpload();">Upload</button> -->
+	<script>
+        function thisFileUpload() {
+            document.getElementById("upload").click();
+        };
+		
+		 $(document).ready(function(){
+        $("#upload").change(function(){
+          var result = confirm("Are you sure you want to Import CSV/Excel File?");
+				if (result) {
+				console.log("started");
+				var formData = new FormData();
+				formData.append('file', $('#upload')[0].files[0]);				
+									 $.ajax({
+						 url:"/laravelAPI/public/api/import",
+						 method:"POST",
+						 processData: false,  // tell jQuery not to process the data
+       contentType: false,  // tell jQuery not to set contentType
+						 data:formData,
+						 success:function(data){
+							 var obj = jQuery.parseJSON( data );
+							 console.log(obj.data);
+							 for(var i =0;i < obj.data.length;i++)
+							 if(obj.data[i].indexOf("Added") != -1){
+						  $('#alert_message').html('<div class="alert alert-success">'+obj.data[i]+'</div>');
+							 }else{
+						  $('#alert_message').html('<div class="alert alert-danger">'+obj.data[i]+'</div>');
+							 
+							 }
+						 }
+						});
+						
+				}
+        });
+    });
+</script>
+    </div>
+    <br />
+    <div id="alert_message"></div>
+    <table id="user_data" class="table table-bordered table-striped">
+     <thead>
+      <tr>
+       <th>Student ID</th>
+       <th>Name</th>
+       <th>Email</th>
+       <th>Gender</th>
+       <th>Status</th>
+       <th>Address 1</th>
+       <th>Address 2</th>
+       <th>City</th>
+       <th>Country</th>
+       <th>Post Title</th>
+       <th>Post Body</th>
+       <th></th>
+      </tr>
+     </thead>
+    </table>
+   </div>
+  </div>
+ </body>
+
+
+<!-- Modal -->
+<div id="editor" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">EDIT Student ID : {{$scope.edit.studid}}</h4>
+      </div>
+      <div class="modal-body">
+      Student ID:  <input id="edit_studid" class="form-control form-control-sm" type="number" readonly="">  
+      Name:  <input id="edit_name" class="form-control form-control-sm" type="text" placeholder="">
+      Email:  <input  id="edit_email" class="form-control form-control-sm" type="text" placeholder="">
+      Gender:
+<input  id="edit_gender" class="form-control form-control-sm" type="text" placeholder="">
+
+      Status:
+<input  id="edit_status" class="form-control form-control-sm" type="text" placeholder="">
+      Address 1:
+<input  id="edit_address1" class="form-control form-control-sm" type="text" placeholder="">
+      Address 2:
+<input  id="edit_address2" class="form-control form-control-sm" type="text" placeholder="">
+      City:
+<input  id="edit_city" class="form-control form-control-sm" type="text" placeholder="">
+      Country:
+<input  id="edit_country" class="form-control form-control-sm" type="text" placeholder="">
+      Post Title:
+<input  id="edit_post_title" class="form-control form-control-sm" type="text" placeholder="">
+      Post Body:
+<input  id="edit_post_body" class="form-control form-control-sm" type="text" placeholder="">
+
+
+<button class="btn btn-primary" ng-click="editor_data()">Submit</button>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+</html>
+
+
+
+<script type="text/javascript" language="javascript" >
+ $(document).ready(function(){
+  
+  //fetch_data();
+  function insert(){
+    //angular.element(document.getElementById('listApp')).scope().insert();
+  }
+  function fetch_data()
+  {
+   var dataTable = $('#user_data').DataTable({
+    "processing" : true,
+    "serverSide" : true,
+    "order" : [],
+    "ajax" : {
+     url:"laravelAPI/public/api/posts",
+     type:"POST"
+    }
+   });
+  }
+ 
+  function update_data(id, column_name, value)
+  {
+   $.ajax({
+    url:"update.php",
+    method:"POST",
+    data:{id:id, column_name:column_name, value:value},
+    success:function(data)
+    {
+     $('#alert_message').html('<div class="alert alert-success">'+data+'</div>');
+     $('#user_data').DataTable().destroy();
+     getDataHolder();
+    }
+   });
+   setInterval(function(){
+    $('#alert_message').html('');
+   }, 5000);
+  }
+  $(document).on('blur', '.update', function(){
+   var id = $(this).data("id");
+   var column_name = $(this).data("column");
+   var value = $(this).text();
+   update_data(id, column_name, value);
+  });
+  
+  $('#add').click(function(){
+   var html = '<tr>';
+   html += '<td  id="data1"></td>';
+   html += '<td contenteditable id="data2"></td>';
+   html += '<td contenteditable id="data3"></td>';
+   html += '<td contenteditable id="data4"></td>';
+   html += '<td contenteditable id="data5"></td>';
+   html += '<td contenteditable id="data6"></td>';
+   html += '<td contenteditable id="data7"></td>';
+   html += '<td contenteditable id="data8"></td>';
+   html += '<td contenteditable id="data9"></td>';
+   html += '<td contenteditable id="data10"></td>';
+   html += '<td contenteditable id="data11"></td>';
+   html += '<td><button type="button" id="insert" onclick="insert()" class="btn btn-success btn-xs">Insert</button></td>';
+   html += '</tr>';
+   $('#user_data tbody').prepend(html);
+  });
+  
+  $(document).on('click', '#insert', function(){
+var name = $('#data2').text();
+   var gender = $('#data4').text();
+   var email = $('#data3').text();
+   var status = $('#data5').text();
+   var address1 = $('#data6').text();
+   var address2 = $('#data7').text();
+   var city = $('#data8').text();
+   var country = $('#data9').text();
+   var post_title = $('#data10').text();
+   var post_body = $('#data11').text();
+   var token = getCookie("token");
+   if(name != '' && gender != '' )
+   {
+    $.ajax({
+     url:"/laravelAPI/public/api/student",
+     method:"POST",
+      headers: {
+      "Authorization": "Bearer " + token
+      },
+    data : {name:name, gender:gender,email:email,gender:gender,status:status,address2:address2,address1:address1,city:city,country:country,post_title:post_title,post_body:post_body},
+     success:function(data)
+     {
+      $('#alert_message').html('<div class="alert alert-success">'+data.message+'</div>');
+      $('#user_data').DataTable().destroy();
+      getDataHolder();
+     }
+    });
+    setInterval(function(){
+     $('#alert_message').html('');
+    }, 5000);
+   }
+   else
+   {
+    alert("Host and Mac Address Fields is required");
+   }
+  });
+  
+  $(document).on('click', '.delete', function(){
+   var id = $(this).attr("id");
+   if(confirm("Are you sure you want to remove this?"))
+   {
+    $.ajax({
+     url:"delete.php",
+     method:"POST",
+     data:{id:id},
+     success:function(data){
+      $('#alert_message').html('<div class="alert alert-success">'+data+'</div>');
+      $('#user_data').DataTable().destroy();
+      getDataHolder();
+     }
+    });
+    setInterval(function(){
+     $('#alert_message').html('');
+    }, 5000);
+   }
+  });
+ });
+ $( document ).ready(function() {
+    $("#main_title").html( "Student Management" );
+});
+</script>
+
+
