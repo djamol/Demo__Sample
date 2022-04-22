@@ -15,11 +15,11 @@ mainApp.config(['$routeProvider', function($routeProvider) {
         controller: 'SignupController'
     }).
 
-    when('/dashboard', {
+    when('/router', {
         templateUrl: 'template/index.html',
         controller: 'MainController'
     }).
-    when('/student', {
+    when('/dashboard', {
         templateUrl: 'template/student.html',
         controller: 'StudentController'
     }).

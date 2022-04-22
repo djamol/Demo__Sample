@@ -1,4 +1,3 @@
-var mainAppControllers = angular.module('mainAppControllers', []);
 var getDataHolder,deleteItem,editItem;
  $("#main_title").html("Student Management");
 mainAppControllers.controller('StudentController', ['$scope', '$http','$location', function ($scope, $http,$location) {
